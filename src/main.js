@@ -148,6 +148,31 @@ document.querySelector("#year").textContent = String(new Date().getFullYear());
 const form = document.querySelector("#project-form");
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (form.dataset.contactMode === "email") {
+    const values = new FormData(form);
+    const subject = `Demande de devis — ${values.get("projet")}`;
+    const body = [
+      "Bonjour, voici mon projet :",
+      "",
+      `Nom : ${values.get("nom")}`,
+      `E-mail : ${values.get("email")}`,
+      `Ville : ${values.get("ville") || "Non précisée"}`,
+      `Type de projet : ${values.get("projet")}`,
+      `Nuance : ${values.get("nuance") || "À définir"}`,
+      "",
+      values.get("message"),
+      "",
+      "J’accepte que ces informations soient utilisées pour répondre à cette demande.",
+    ].join("\n");
+    const draft = document.querySelector("#email-draft");
+    draft.href = `mailto:${form.dataset.contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    draft.hidden = false;
+    const status = document.querySelector("#form-status");
+    status.textContent = "Votre e-mail est prêt. Ouvrez votre messagerie, puis envoyez-le pour nous transmettre votre demande.";
+    status.hidden = false;
+    draft.focus();
+    return;
+  }
   const button = form.querySelector('[type="submit"]');
   const error = document.querySelector("#form-error");
   error.hidden = true;
@@ -155,7 +180,7 @@ form.addEventListener("submit", async (event) => {
   form.setAttribute("aria-busy", "true");
   button.querySelector(".submit-label").textContent = "Envoi en cours…";
   try {
-    const response = await fetch("/", {
+    const response = await fetch(import.meta.env.BASE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams(new FormData(form)).toString(),

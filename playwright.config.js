@@ -7,11 +7,14 @@ const executablePath =
 
 export default defineConfig({
   testDir: "./tests",
+  testMatch: process.env.PAGES_TEST ? "**/pages.spec.js" : "**/site.spec.js",
   fullyParallel: true,
   workers: 2,
   reporter: "list",
   use: {
-    baseURL: "http://127.0.0.1:4173",
+    baseURL: process.env.PAGES_TEST
+      ? "http://127.0.0.1:4173/beton-decoratif-provence/"
+      : "http://127.0.0.1:4173",
     browserName: "chromium",
     launchOptions: { executablePath },
     trace: "retain-on-failure",
@@ -28,8 +31,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run preview -- --port 4173 --strictPort",
-    url: "http://127.0.0.1:4173",
+    command: process.env.PAGES_TEST
+      ? "npm run preview -- --mode pages --port 4173 --strictPort"
+      : "npm run preview -- --port 4173 --strictPort",
+    url: process.env.PAGES_TEST
+      ? "http://127.0.0.1:4173/beton-decoratif-provence/"
+      : "http://127.0.0.1:4173",
     reuseExistingServer: false,
   },
 });

@@ -1,7 +1,10 @@
 import { defineConfig } from "vite";
 import { fileURLToPath } from "node:url";
+import { pagesHtml } from "./scripts/pages-html.js";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  base: mode === "pages" ? "/beton-decoratif-provence/" : "/",
+  plugins: mode === "pages" ? [pagesHtml()] : [],
   build: {
     rolldownOptions: {
       input: {
@@ -10,4 +13,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

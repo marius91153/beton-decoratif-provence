@@ -26,6 +26,8 @@ The tests run on Chromium at desktop and mobile sizes. They exercise navigation,
 
 `netlify.toml` uses `npm run build`, publishes `dist` and selects Node.js 24. Connect this repository to the existing Netlify project and use the intended production branch. No Netlify credentials are required for local development.
 
+The configured Netlify address is `https://beton-decoratif-provence.netlify.app/`, connected to the production branch `main`.
+
 Enable form detection in the Netlify project before deployment. The static `devis` form includes `data-netlify`, its form name and a honeypot. On Netlify, successful requests go to `/merci/`. Without JavaScript, the HTML form also submits natively. Configure submission notifications in Netlify, then verify a real submission after deployment. The local Vite server does not process form submissions.
 
 ## Before the first public release
@@ -37,3 +39,11 @@ Enable form detection in the Netlify project before deployment. The static `devi
 - Commit and push the reviewed source to GitHub, deploy on Netlify and verify the live form. Creating files locally does not publish the site.
 
 No analytics, remote fonts or third-party image requests are included.
+
+## GitHub Pages alternative
+
+The business contact address is `contact@betondecoratifprovence.fr`. `npm run build:pages` builds the site for `/beton-decoratif-provence/` and changes the quote form into an email preparation flow. The visitor fills in the project, prepares the email, opens their mail app and sends it. Preparing the draft does not deliver a message. There is also a direct email link and a native mail form fallback. The Netlify build keeps its original form handler.
+
+Validate this version with `npm run build:pages` followed by `PAGES_TEST=1 npm test`. `npm run deploy:pages` builds locally and pushes the generated files to `gh-pages`, preserving its history. It uses existing Git authentication and requires no Netlify account or Netlify credits. It does not activate the GitHub Pages setting.
+
+For the initial activation, GitHub Pages must publish from branch `gh-pages`, folder `/ (root)`. The expected URL is `https://marius91153.github.io/beton-decoratif-provence/`. A successful Git push alone does not confirm that the site is live; check the public URL after GitHub finishes publishing. Future releases use the same deployment command.

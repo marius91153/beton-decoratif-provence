@@ -716,7 +716,7 @@
             method="POST"
             data-netlify="true"
             netlify-honeypot="bot-field"
-            action="/merci/"
+            action="%BASE_URL%merci/"
           >
             <input type="hidden" name="form-name" value="devis" />
             <input
@@ -797,6 +797,10 @@
               ></label
             >
             <p id="form-error" class="form-error" role="alert" hidden></p>
+            <p id="contact-help" class="field-help">
+              Vous pouvez aussi écrire à
+              <a href="mailto:contact@betondecoratifprovence.fr">contact@betondecoratifprovence.fr</a>.
+            </p>
             <button class="button submit-button" type="submit">
               <span class="submit-label">Envoyer ma demande</span
               ><span aria-hidden="true"
