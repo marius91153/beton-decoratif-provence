@@ -5,6 +5,9 @@ test("the production page loads its assets without browser errors", async ({
 }, testInfo) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  page.on("response", (response) => {
+    if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`);
+  });
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     "Le béton imprimé.",
@@ -222,4 +225,28 @@ test("the layout fits a narrow screen with reduced motion enabled", async ({
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.getByRole("button", { name: "Choisir cette inspiration" }).click();
   await expect(page.locator("#project-message")).toBeInViewport();
+});
+
+test("the optimized page remains styled and usable without JavaScript", async ({ browser }, testInfo) => {
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: testInfo.project.use.viewport,
+  });
+  const page = await context.newPage();
+  const failures = [];
+  page.on("response", response => {
+    if (response.status() >= 400) failures.push(response.url());
+  });
+  await page.goto("http://127.0.0.1:4173/");
+  await page.evaluate(() => document.fonts.ready);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCSS("font-family", /Manrope/);
+  await expect(page.locator(".hero-art img")).toBeVisible();
+  expect(await page.locator(".hero-art img").evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
+  await page.getByRole("link", { name: /Demander mon devis gratuit/ }).click();
+  await expect(page).toHaveURL(/#contact$/);
+  await expect(page.getByLabel("Votre nom")).toBeVisible();
+  await expect(page.locator("#project-form")).toHaveAttribute("method", "POST");
+  await expect(page.locator("#project-form")).toHaveAttribute("action", "/merci/");
+  expect(failures).toEqual([]);
+  await context.close();
 });

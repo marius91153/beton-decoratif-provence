@@ -52,6 +52,14 @@ Enable form detection in the Netlify project before deployment. The static `devi
 
 No analytics, remote fonts or third-party image requests are included.
 
+## Performance
+
+Production builds generate AVIF photographs with responsive WebP fallbacks using the pinned Sharp dependency. The original social photographs remain in `public/images/projets`; `scripts/optimized-assets.js` removes their video padding and generates fingerprinted files under `assets`. Phones receive a separate crop of the same hero photograph. Gallery images remain lazy-loaded; the hero retains high fetch priority. Fontsource Latin fonts are preloaded locally, with Latin Extended available for names. Preserve their Unicode-range order so accented text does not download both subsets.
+
+The small minified stylesheets are inlined during the build, preserving their order and rewriting font URLs for both hosting paths. The confirmation page includes only font declarations and its own styles. Styling does not depend on JavaScript. Netlify caches fingerprinted assets for one year while HTML and `release.json` retain revalidation. GitHub Pages controls its own cache headers. The homepage's canonical URL and sitemap point to `https://betondecoratifprovence.fr/`; the confirmation page remains `noindex`.
+
+Use PageSpeed Insights on the public custom domain for remote measurements. If Google blocks the audit, report that limitation rather than presenting local results as Google reports. For a comparable local audit, start `npm run preview -- --port 4173 --strictPort` after building, then use pinned Lighthouse 13.5.0 with Chromium. Measure mobile and desktop separately, with no concurrent builds or browser tests. Repeat only when a change or observed measurement variance warrants it. Stop that preview before running Playwright, since the test runner owns port 4173. The performance audit and its measurement limitations are recorded in [docs/performance-audit-2026-10-08.md](docs/performance-audit-2026-10-08.md).
+
 ## Automatic publication after a commit
 
 Push commits to `main`. `.github/workflows/deploy.yml` builds and tests both site variants in GitHub Actions, then publishes GitHub Pages with the official Pages actions and Netlify through the tested preview-and-restore API workflow. Netlify does not build this release on its own infrastructure. Releases run in sequence so an older build cannot overwrite a newer release. `workflow_dispatch` allows retrying the latest `main` release from the Actions page. Both hosting jobs reject other source branches, including manual dispatches. Pages uses the `github-pages-actions` environment for this main-branch workflow; the legacy `github-pages` environment retains its existing `gh-pages` branch restriction.
