@@ -56,6 +56,8 @@ Push commits to `main`. `.github/workflows/deploy.yml` builds and tests both sit
 
 GitHub Actions needs a repository secret named `BDP_NETLIFY_TOKEN`, containing a Netlify personal access token that can access this project. Configure it at **GitHub → repository Settings → Secrets and variables → Actions**. The same-named Codex secret belongs to a separate system and is not automatically available to GitHub Actions. Credentials are supplied only to the deployment steps, never committed or included in the site's client variables.
 
+Also select **GitHub → repository Settings → Pages → Build and deployment → Source → GitHub Actions**. GitHub's workflow token can deploy Pages artifacts but cannot change this repository setting; the workflow checks it and reports a precise setup error. The available Codex GitHub integration also returned HTTP 403 when changing Pages settings or saving the Actions secret. Once these two repository settings are configured, subsequent pushes and workflow retries require no manual upload.
+
 Each build includes `release.json` with its source commit and working-tree status. Compare that commit on both public hosts with the completed Actions run to confirm that the actual latest release is live. Local commits need to be pushed before the remote workflow runs. GitHub Actions results are visible at `https://github.com/marius91153/beton-decoratif-provence/actions/workflows/deploy.yml`.
 
 ## GitHub Pages alternative
@@ -64,4 +66,4 @@ The business contact address is `contact@betondecoratifprovence.fr`. `npm run bu
 
 Validate this version with `npm run build:pages` followed by `PAGES_TEST=1 npm test`. `npm run deploy:pages` requests the automatic release workflow for the pushed `main` branch; it requires GitHub Actions workflow-dispatch access through `gh`. The workflow runs both hosting jobs. Local, unpushed changes are not part of that release.
 
-GitHub Pages uses the Actions publishing mode at `https://marius91153.github.io/beton-decoratif-provence/`. The previous `gh-pages` branch remains as release history. Check the workflow result and public `release.json` after GitHub finishes publishing.
+The workflow publishes GitHub Pages in Actions mode at `https://marius91153.github.io/beton-decoratif-provence/`. The previous `gh-pages` branch remains as release history. Check the workflow result and public `release.json` after GitHub finishes publishing.

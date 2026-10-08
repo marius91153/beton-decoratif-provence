@@ -28,6 +28,14 @@ jobs:
       url: ${{ steps.publish.outputs.page_url }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Check GitHub Pages publishing source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq .build_type)" != "workflow" ]; then
+            echo "::error::Choose GitHub Actions under repository Settings > Pages > Build and deployment > Source."
+            exit 1
+          fi
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version-file: .nvmrc
@@ -38,10 +46,6 @@ jobs:
       - run: npm test
         env:
           PAGES_TEST: "1"
-      - name: Configure Pages to publish Actions artifacts
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh api --method PUT "repos/$GITHUB_REPOSITORY/pages" -f build_type=workflow > /dev/null
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
