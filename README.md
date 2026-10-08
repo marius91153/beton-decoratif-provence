@@ -1,6 +1,8 @@
 # Béton Décoratif Provence
 
-First French-language website for the project: services, an interactive finish palette, the project process, frequently asked questions and a quote request form. Built with Vite and plain HTML, CSS and JavaScript. All visuals are local illustrations; they are not photographs of completed customer projects.
+French-language website for stamped concrete (béton imprimé): outdoor terraces, access paths and pool surrounds, a gallery of the business's actual projects, an indicative color palette, the project process, frequently asked questions and a quote request form. Built with Vite and plain HTML, CSS and JavaScript. Six locally hosted photographs come from the owner's public TikTok posts; provenance and the limits of social-profile access are recorded in [docs/social-media-sources.md](docs/social-media-sources.md).
+
+Facebook, Instagram, TikTok and WhatsApp buttons use the owner's supplied accounts. WhatsApp also appears in the fixed mobile contact bar and quotation section. The telephone link uses the number published in the TikTok biography, `07 54 25 36 93`. The site offers the free, personalized, no-obligation quote stated in that biography. Exposed-aggregate concrete (béton désactivé) is presented separately from stamped concrete.
 
 The visual direction follows the owner's other site, `urbiscor.ro`: a dark header and full-width hero, golden calls to action, Manrope headings, Inter body text and fixed quotation actions on mobile. `src/theme.css` defines this visual layer; `src/styles.css` provides the base layout and controls. Fontsource packages supply the locally hosted fonts under the SIL Open Font License, included in `public/fonts`.
 
@@ -45,7 +47,7 @@ Enable form detection in the Netlify project before deployment. The static `devi
 - Approve the final brand details and design. The public Urbiscor site has now been inspected and its visual direction adapted to this project's French-language content.
 - Confirm service descriptions, available finishes, coverage area and branding with the business owner.
 - Add the business's legal identification, privacy contact, retention policy and any required legal notices. The current short data-use explanation is not a complete privacy policy.
-- Replace illustrations with approved photographs if actual projects should be shown.
+- The gallery now uses the owner's social project photographs. Original high-resolution photographs can replace video covers when available; each selected image links to its public source.
 - Commit and push the reviewed source to GitHub, deploy on Netlify and verify the live form. Creating files locally does not publish the site.
 
 No analytics, remote fonts or third-party image requests are included.

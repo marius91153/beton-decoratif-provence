@@ -79,7 +79,7 @@ def build_files(skip_build=False):
         subprocess.run(["npm", "run", "build"], cwd=ROOT, check=True)
     files = {p.relative_to(ROOT / "dist").as_posix(): p.read_bytes() for p in (ROOT / "dist").rglob("*") if p.is_file()}
     html = files["index.html"].decode()
-    if "Le béton décoratif." not in html or CONTACT not in html or 'data-contact-mode="email"' in html or "merci/index.html" not in files:
+    if "Le béton imprimé." not in html or CONTACT not in html or 'data-contact-mode="email"' in html or "merci/index.html" not in files:
         raise RuntimeError("The output is not the expected Netlify build")
     release = json.loads(files["release.json"])
     source_commit = subprocess.check_output(["git", "rev-parse", "--verify", "HEAD"], cwd=ROOT, text=True).strip()

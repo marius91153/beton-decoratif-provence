@@ -7,7 +7,7 @@ test("the production page loads its assets without browser errors", async ({
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Le béton décoratif.",
+    "Le béton imprimé.",
   );
   await expect(page.locator("html")).toHaveAttribute("lang", "fr");
   await expect(page.locator(".hero-art img")).toBeVisible();
@@ -103,20 +103,21 @@ test("navigation, service selection and frequently asked questions work", async 
       page.getByRole("navigation", { name: "Navigation principale" }),
     ).not.toBeVisible();
     await expect(quickActions).toBeVisible();
-    await quickActions.getByRole("link", { name: "Les finitions" }).click();
-    await expect(page).toHaveURL(/#matieres$/);
+    await expect(
+      quickActions.getByRole("link", { name: /Écrire sur WhatsApp/ }),
+    ).toHaveAttribute("href", "https://wa.me/message/I7RZCIKHK42VP1");
     await quickActions.getByRole("link", { name: "Demander un devis" }).click();
     await expect(page).toHaveURL(/#contact$/);
   } else {
     await expect(quickActions).not.toBeVisible();
   }
-  await page.getByRole("link", { name: /Parlons de votre espace/ }).click();
-  await expect(page.locator("#project-type")).toHaveValue("Pièce d’eau");
+  await page.getByRole("link", { name: /Aménager ma piscine/ }).click();
+  await expect(page.locator("#project-type")).toHaveValue("Plage de piscine");
   await page
-    .getByText("Peut-on recouvrir un carrelage existant ?", { exact: false })
+    .getByText("Peut-on réaliser une allée carrossable ?", { exact: false })
     .click();
   await expect(
-    page.getByText("C’est possible dans certains cas.", { exact: false }),
+    page.getByText("Le projet doit être dimensionné pour les véhicules prévus.", { exact: false }),
   ).toBeVisible();
   await page
     .getByRole("link", { name: "Confidentialité", exact: true })
@@ -129,10 +130,10 @@ async function fillRequest(page) {
   await page.getByLabel("Votre nom").fill("Camille Test");
   await page.getByLabel("Votre e-mail").fill("camille@example.test");
   await page.getByLabel("Votre ville").fill("Aix-en-Provence");
-  await page.getByLabel("Type de projet").selectOption("Béton ciré");
+  await page.getByLabel("Type de projet").selectOption("Terrasse ou cour");
   await page
     .getByLabel("Parlez-nous de votre projet")
-    .fill("Un projet de sol minéral dans un salon de 35 mètres carrés.");
+    .fill("Un projet de béton imprimé pour une terrasse de 35 mètres carrés.");
   await page.getByRole("checkbox").check();
 }
 
@@ -158,12 +159,12 @@ test("a valid request sends the Netlify fields and reaches the confirmation page
   );
   expect(submitted.get("form-name")).toBe("devis");
   expect(submitted.get("email")).toBe("camille@example.test");
-  expect(submitted.get("projet")).toBe("Béton ciré");
+  expect(submitted.get("projet")).toBe("Terrasse ou cour");
   expect(submitted.get("consentement")).toBe("oui");
   expect(submitted.get("bot-field")).toBe("");
   await page.getByRole("link", { name: "Revenir au site" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Le béton décoratif.",
+    "Le béton imprimé.",
   );
 });
 
@@ -184,7 +185,7 @@ test("a failed submission preserves the request and allows a retry", async ({
     "camille@example.test",
   );
   await expect(page.getByLabel("Parlez-nous de votre projet")).toHaveValue(
-    /salon de 35/,
+    /terrasse de 35/,
   );
   await expect(
     page.getByRole("button", { name: "Envoyer ma demande" }),

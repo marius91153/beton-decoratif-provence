@@ -2,27 +2,27 @@ const materials = {
   sable: {
     name: "Sable",
     description:
-      "Un beige lumineux aux accents de pierre claire. Une inspiration douce pour accompagner le bois et les fibres naturelles.",
+      "Un beige lumineux aux accents de pierre claire. Une inspiration pour accorder votre sol extérieur à une façade claire.",
   },
   greige: {
     name: "Greige",
     description:
-      "Entre le gris et le beige, une nuance équilibrée qui dialogue avec des espaces sobres et des matériaux naturels.",
+      "Entre le gris et le beige, une nuance équilibrée qui dialogue avec les façades et les aménagements du jardin.",
   },
   argile: {
     name: "Argile",
     description:
-      "Une tonalité terreuse, chaleureuse et feutrée. Une inspiration pour créer des espaces enveloppants.",
+      "Une tonalité terreuse, chaleureuse et feutrée. Une inspiration pour apporter une teinte chaude à une terrasse.",
   },
   craie: {
     name: "Craie",
     description:
-      "Un blanc minéral, délicatement nuancé. Une inspiration pour laisser la lumière dessiner les volumes.",
+      "Un blanc minéral, délicatement nuancé. Une inspiration pour imaginer un sol extérieur clair.",
   },
   graphite: {
     name: "Graphite",
     description:
-      "Un gris profond au caractère architectural. Une inspiration pour souligner un volume ou créer un contraste.",
+      "Un gris profond au caractère architectural. Une inspiration pour souligner une allée ou créer un contraste avec la façade.",
   },
   terre: {
     name: "Terre cuite",
@@ -117,7 +117,7 @@ document.querySelector("#choose-material").addEventListener("click", () => {
   const name = materials[selectedMaterial].name;
   document.querySelector("#selected-material").value = name;
   const message = document.querySelector("#project-message");
-  const starter = `Je souhaite échanger sur un projet avec une nuance ${name}.`;
+  const starter = `Je souhaite échanger sur un projet de béton imprimé avec une nuance ${name}.`;
   if (!message.value.trim() || message.value === lastMaterialMessage) {
     message.value = starter;
     lastMaterialMessage = starter;
