@@ -74,12 +74,17 @@ class Netlify:
             deploy = self.request("/deploys/" + deploy["id"])
 
 
-def build_files():
-    subprocess.run(["npm", "run", "build"], cwd=ROOT, check=True)
+def build_files(skip_build=False):
+    if not skip_build:
+        subprocess.run(["npm", "run", "build"], cwd=ROOT, check=True)
     files = {p.relative_to(ROOT / "dist").as_posix(): p.read_bytes() for p in (ROOT / "dist").rglob("*") if p.is_file()}
     html = files["index.html"].decode()
     if "Le béton décoratif." not in html or CONTACT not in html or 'data-contact-mode="email"' in html or "merci/index.html" not in files:
         raise RuntimeError("The output is not the expected Netlify build")
+    release = json.loads(files["release.json"])
+    source_commit = subprocess.check_output(["git", "rev-parse", "--verify", "HEAD"], cwd=ROOT, text=True).strip()
+    if release.get("commit") != source_commit or (os.environ.get("CI") and release.get("dirty") is not False):
+        raise RuntimeError("The build is stale or does not represent the clean source commit; rebuild before publishing")
     settings = tomllib.loads((ROOT / "netlify.toml").read_text())
     headers = []
     for rule in settings.get("headers", []):
@@ -105,8 +110,11 @@ def configure_notifications(client):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--preview-only", action="store_true", help="Upload a preview without changing the published deployment")
+    parser.add_argument("--skip-build", action="store_true", help="Publish the already built and tested Netlify output")
     options = parser.parse_args()
-    files = build_files()
+    if os.environ.get("CI") and not os.environ.get("BDP_NETLIFY_TOKEN"):
+        raise RuntimeError("Add the BDP_NETLIFY_TOKEN repository secret in GitHub Actions before publishing")
+    files = build_files(options.skip_build)
     warnings.simplefilter("error", getpass.GetPassWarning)
     token = os.environ.get("BDP_NETLIFY_TOKEN") or getpass.getpass("Netlify token (hidden): ")
     client = Netlify(token)
@@ -119,7 +127,9 @@ def main():
         client.request("/sites/" + SITE_ID, "PATCH", {"processing_settings": processing})
         print("Enabled Netlify form detection", flush=True)
     manifest = {name: hashlib.sha1(content).hexdigest() for name, content in files.items()}
-    deploy = client.request(f"/sites/{SITE_ID}/deploys?title=Local%20build%20-%20manual%20preview", "POST", {"files": manifest, "draft": True, "async": True})
+    source_commit = json.loads(files["release.json"])["commit"]
+    query = urllib.parse.urlencode({"title": "Publish source " + source_commit})
+    deploy = client.request(f"/sites/{SITE_ID}/deploys?{query}", "POST", {"files": manifest, "draft": True, "async": True})
     print("Created preview:", deploy["id"], flush=True)
     deploy = client.wait(deploy, {"prepared", "ready"})
     if deploy.get("context") != "deploy-preview" or deploy.get("published_at"):

@@ -8,8 +8,8 @@
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
-    "build:pages": "vite build --mode pages",
+    "build": "vite build && node scripts/write-release.mjs",
+    "build:pages": "vite build --mode pages && node scripts/write-release.mjs",
     "deploy:netlify": "python3 scripts/deploy-netlify.py",
     "deploy:pages": "bash scripts/deploy-pages.sh",
     "preview": "vite preview --host 0.0.0.0",

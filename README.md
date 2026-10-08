@@ -50,10 +50,18 @@ Enable form detection in the Netlify project before deployment. The static `devi
 
 No analytics, remote fonts or third-party image requests are included.
 
+## Automatic publication after a commit
+
+Push commits to `main`. `.github/workflows/deploy.yml` builds and tests both site variants in GitHub Actions, then publishes GitHub Pages with the official Pages actions and Netlify through the tested preview-and-restore API workflow. Netlify does not build this release on its own infrastructure. Releases run in sequence so an older build cannot overwrite a newer release. `workflow_dispatch` allows retrying the latest `main` release from the Actions page.
+
+GitHub Actions needs a repository secret named `BDP_NETLIFY_TOKEN`, containing a Netlify personal access token that can access this project. Configure it at **GitHub → repository Settings → Secrets and variables → Actions**. The same-named Codex secret belongs to a separate system and is not automatically available to GitHub Actions. Credentials are supplied only to the deployment steps, never committed or included in the site's client variables.
+
+Each build includes `release.json` with its source commit and working-tree status. Compare that commit on both public hosts with the completed Actions run to confirm that the actual latest release is live. Local commits need to be pushed before the remote workflow runs. GitHub Actions results are visible at `https://github.com/marius91153/beton-decoratif-provence/actions/workflows/deploy.yml`.
+
 ## GitHub Pages alternative
 
 The business contact address is `contact@betondecoratifprovence.fr`. `npm run build:pages` builds the site for `/beton-decoratif-provence/` and changes the quote form into an email preparation flow. The visitor fills in the project, prepares the email, opens their mail app and sends it. Preparing the draft does not deliver a message. There is also a direct email link and a native mail form fallback. The Netlify build keeps its original form handler.
 
-Validate this version with `npm run build:pages` followed by `PAGES_TEST=1 npm test`. `npm run deploy:pages` builds locally and pushes the generated files to `gh-pages`, preserving its history. It uses existing Git authentication and requires no Netlify account or Netlify credits. It does not activate the GitHub Pages setting.
+Validate this version with `npm run build:pages` followed by `PAGES_TEST=1 npm test`. `npm run deploy:pages` requests the automatic release workflow for the pushed `main` branch; it requires GitHub Actions workflow-dispatch access through `gh`. The workflow runs both hosting jobs. Local, unpushed changes are not part of that release.
 
-GitHub Pages is already active from branch `gh-pages`, folder `/ (root)`, at `https://marius91153.github.io/beton-decoratif-provence/`. Its French page was verified through HTTP. A successful Git push alone does not confirm that a new release is live; check the public URL after GitHub finishes publishing. Future releases use the same deployment command.
+GitHub Pages uses the Actions publishing mode at `https://marius91153.github.io/beton-decoratif-provence/`. The previous `gh-pages` branch remains as release history. Check the workflow result and public `release.json` after GitHub finishes publishing.
