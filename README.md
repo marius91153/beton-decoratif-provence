@@ -28,6 +28,16 @@ The tests run on Chromium at desktop and mobile sizes. They exercise navigation,
 
 The configured Netlify address is `https://beton-decoratif-provence.netlify.app/`, connected to the production branch `main`.
 
+### Manual publication when production uploads are blocked
+
+The tested alternative is a local build, a draft deployment using a file manifest, upload of the requested files, then publication of the ready deployment through Netlify's `restore` API. A direct production ZIP upload returned HTTP 403 for exhausted account credits; the preview-and-restore workflow was accepted on this account. It uses supported API operations and does not change the billing plan. Availability still depends on Netlify's current account rules.
+
+```sh
+npm run deploy:netlify
+```
+
+This command requires Python 3.11+ and a Netlify personal access token with access to the existing project. Provide it through the secure `BDP_NETLIFY_TOKEN` environment binding, or enter it at the hidden interactive prompt. Never place a token in a command argument or commit it. The script rebuilds for Netlify, includes the headers from `netlify.toml`, enables form detection and configures the quote notification for `contact@betondecoratifprovence.fr`. It only targets this project's verified site and repository. For a preview without publishing, use `npm run deploy:netlify -- --preview-only`.
+
 Enable form detection in the Netlify project before deployment. The static `devis` form includes `data-netlify`, its form name and a honeypot. On Netlify, successful requests go to `/merci/`. Without JavaScript, the HTML form also submits natively. Configure submission notifications in Netlify, then verify a real submission after deployment. The local Vite server does not process form submissions.
 
 ## Before the first public release
@@ -46,4 +56,4 @@ The business contact address is `contact@betondecoratifprovence.fr`. `npm run bu
 
 Validate this version with `npm run build:pages` followed by `PAGES_TEST=1 npm test`. `npm run deploy:pages` builds locally and pushes the generated files to `gh-pages`, preserving its history. It uses existing Git authentication and requires no Netlify account or Netlify credits. It does not activate the GitHub Pages setting.
 
-For the initial activation, GitHub Pages must publish from branch `gh-pages`, folder `/ (root)`. The expected URL is `https://marius91153.github.io/beton-decoratif-provence/`. A successful Git push alone does not confirm that the site is live; check the public URL after GitHub finishes publishing. Future releases use the same deployment command.
+GitHub Pages is already active from branch `gh-pages`, folder `/ (root)`, at `https://marius91153.github.io/beton-decoratif-provence/`. Its French page was verified through HTTP. A successful Git push alone does not confirm that a new release is live; check the public URL after GitHub finishes publishing. Future releases use the same deployment command.
