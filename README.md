@@ -58,6 +58,8 @@ GitHub Actions needs a repository secret named `BDP_NETLIFY_TOKEN`, containing a
 
 Also select **GitHub → repository Settings → Pages → Build and deployment → Source → GitHub Actions**. GitHub's workflow token can deploy Pages artifacts but cannot change this repository setting; the workflow checks it and reports a precise setup error. The available Codex GitHub integration also returned HTTP 403 when changing Pages settings or saving the Actions secret. Once these two repository settings are configured, subsequent pushes and workflow retries require no manual upload.
 
+Both required GitHub settings are now configured, and the automatic release workflow successfully published both hosting variants on 2026-10-08. Netlify's own Git-triggered builds are stopped (`stop_builds: true`), while its GitHub repository connection remains intact. GitHub Actions builds the website and publishes through the supported API route, avoiding redundant builds on Netlify.
+
 Each build includes `release.json` with its source commit and working-tree status. Compare that commit on both public hosts with the completed Actions run to confirm that the actual latest release is live. Local commits need to be pushed before the remote workflow runs. GitHub Actions results are visible at `https://github.com/marius91153/beton-decoratif-provence/actions/workflows/deploy.yml`.
 
 ## GitHub Pages alternative
