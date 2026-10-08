@@ -16,6 +16,7 @@ concurrency:
 jobs:
   github-pages:
     name: GitHub Pages
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -23,7 +24,7 @@ jobs:
       pages: write
       id-token: write
     environment:
-      name: github-pages
+      name: github-pages-actions
       url: ${{ steps.publish.outputs.page_url }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -51,6 +52,7 @@ jobs:
 
   netlify:
     name: Netlify
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

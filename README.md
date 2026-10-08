@@ -52,7 +52,7 @@ No analytics, remote fonts or third-party image requests are included.
 
 ## Automatic publication after a commit
 
-Push commits to `main`. `.github/workflows/deploy.yml` builds and tests both site variants in GitHub Actions, then publishes GitHub Pages with the official Pages actions and Netlify through the tested preview-and-restore API workflow. Netlify does not build this release on its own infrastructure. Releases run in sequence so an older build cannot overwrite a newer release. `workflow_dispatch` allows retrying the latest `main` release from the Actions page.
+Push commits to `main`. `.github/workflows/deploy.yml` builds and tests both site variants in GitHub Actions, then publishes GitHub Pages with the official Pages actions and Netlify through the tested preview-and-restore API workflow. Netlify does not build this release on its own infrastructure. Releases run in sequence so an older build cannot overwrite a newer release. `workflow_dispatch` allows retrying the latest `main` release from the Actions page. Both hosting jobs reject other source branches, including manual dispatches. Pages uses the `github-pages-actions` environment for this main-branch workflow; the legacy `github-pages` environment retains its existing `gh-pages` branch restriction.
 
 GitHub Actions needs a repository secret named `BDP_NETLIFY_TOKEN`, containing a Netlify personal access token that can access this project. Configure it at **GitHub → repository Settings → Secrets and variables → Actions**. The same-named Codex secret belongs to a separate system and is not automatically available to GitHub Actions. Credentials are supplied only to the deployment steps, never committed or included in the site's client variables.
 
