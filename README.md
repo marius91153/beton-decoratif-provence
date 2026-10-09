@@ -22,7 +22,7 @@ npm run build
 npm test
 ```
 
-The tests run on Chromium at desktop and mobile sizes. They exercise navigation, finish filters and dialogs, quote request validation, successful submission, failed submission and narrow-screen layout. They mock Netlify's form endpoint; they do not establish live delivery. The test runner uses `/usr/bin/chromium` when available. Elsewhere, install a browser with `npx playwright install chromium`, or set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to a compatible Chromium executable.
+The tests run on Chromium at desktop and mobile sizes. They exercise navigation, finish filters and dialogs, quote request validation, successful submission, failed submission and narrow-screen layout. Shared scroll tests also cover easing, idle frames, direction changes, keyboard/anchor interruption, native textarea/modal scrolling, motion preferences, touch gestures and document boundaries on both hosting builds. They mock Netlify's form endpoint; they do not establish live delivery. The test runner uses `/usr/bin/chromium` when available. Elsewhere, install a browser with `npx playwright install chromium`, or set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to a compatible Chromium executable.
 
 ## Netlify
 
@@ -53,6 +53,8 @@ Enable form detection in the Netlify project before deployment. The static `devi
 No analytics, remote fonts or third-party image requests are included.
 
 ## Performance
+
+`src/smooth-scroll.js` implements the Urbiscor wheel inertia using the browser's real scroll position, without Lenis or another dependency. The inspected reference uses a 1.15-second exponential easing curve, fine-pointer input and native touch. The animation runs only during wheel movement; keyboard, focus, anchor navigation and scrolling inside inputs/dialogs retain their native behavior. Reduced-motion changes cancel the effect immediately. HMR disposes the controller's listeners. Reference measurements and design details are documented in [docs/native-smooth-scroll.md](docs/native-smooth-scroll.md).
 
 Production builds generate AVIF photographs with responsive WebP fallbacks using the pinned Sharp dependency. The original social photographs remain in `public/images/projets`; `scripts/optimized-assets.js` removes their video padding and generates fingerprinted files under `assets`. Phones receive a separate crop of the same hero photograph. Gallery images remain lazy-loaded; the hero retains high fetch priority. Fontsource Latin fonts are preloaded locally, with Latin Extended available for names. Preserve their Unicode-range order so accented text does not download both subsets.
 

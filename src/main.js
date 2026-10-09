@@ -1,3 +1,8 @@
+import { initSmoothScroll } from "./smooth-scroll.js";
+
+const disposeSmoothScroll = initSmoothScroll();
+if (import.meta.hot) import.meta.hot.dispose(disposeSmoothScroll);
+
 const materials = {
   sable: {
     name: "Sable",

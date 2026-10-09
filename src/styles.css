@@ -1005,6 +1005,7 @@ dialog {
   color: var(--ink);
   box-shadow: 0 20px 100px #0003;
   overflow: auto;
+  overscroll-behavior: contain;
 }
 dialog::backdrop {
   background: #18231bc0;

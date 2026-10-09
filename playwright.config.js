@@ -7,7 +7,9 @@ const executablePath =
 
 export default defineConfig({
   testDir: "./tests",
-  testMatch: process.env.PAGES_TEST ? "**/pages.spec.js" : "**/site.spec.js",
+  testMatch: process.env.PAGES_TEST
+    ? ["**/pages.spec.js", "**/scroll.spec.js"]
+    : ["**/site.spec.js", "**/scroll.spec.js"],
   fullyParallel: true,
   workers: 2,
   reporter: "list",
