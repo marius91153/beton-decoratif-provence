@@ -98,7 +98,8 @@ export function inlineStyles() {
     transformIndexHtml: {
       order: "post",
       handler(html, { bundle }) {
-        return html.replace(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g, (tag, href) => {
+        let colorModeStyle = "";
+        const rendered = html.replace(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g, (tag, href) => {
           const filename = href.slice(base.length);
           const asset = bundle?.[filename];
           if (!asset || asset.type !== "asset") throw new Error(`Missing stylesheet ${href}`);
@@ -106,8 +107,15 @@ export function inlineStyles() {
             if (/^(?:data:|https?:|\/|#)/.test(url)) return original;
             return `url(${quote}${base}${posix.join(posix.dirname(filename), url)}${quote})`;
           });
-          return `<style>${css.replace(/<\/style/gi, "<\\/style")}</style>`;
+          const style = `<style>${css.replace(/<\/style/gi, "<\\/style")}</style>`;
+          // Vite emits shared CSS before page CSS. Palette overrides belong last.
+          if (posix.basename(filename).startsWith("color-mode-")) {
+            colorModeStyle += style;
+            return "";
+          }
+          return style;
         });
+        return rendered.replace("</head>", `${colorModeStyle}</head>`);
       },
     },
   };

@@ -4,10 +4,11 @@ import { pagesHtml } from "./scripts/pages-html.js";
 import { inlineStyles, projectImages } from "./scripts/optimized-assets.js";
 import { seoPages } from "./scripts/seo-pages.js";
 import { servicePages } from "./scripts/service-content.js";
+import { colorModeHtml } from "./scripts/color-mode-html.js";
 
 export default defineConfig(({ mode }) => ({
   base: mode === "pages" ? "/beton-decoratif-provence/" : "/",
-  plugins: [seoPages(), projectImages(), ...(mode === "pages" ? [pagesHtml()] : []), inlineStyles()],
+  plugins: [seoPages(), colorModeHtml(), projectImages(), ...(mode === "pages" ? [pagesHtml()] : []), inlineStyles()],
   build: {
     rolldownOptions: {
       input: {
