@@ -5,6 +5,7 @@ export function pagesHtml() {
     name: "pages-contact",
     transformIndexHtml(html) {
       if (!html.includes('id="project-form"')) {
+        if (!html.includes("Merci pour<br />votre confiance.")) return html;
         return html
           .replace("Merci pour<br />votre confiance.", "Parlons de<br />votre projet.")
           .replace(

@@ -71,13 +71,13 @@ export function projectImages() {
           const hero = tag.includes('fetchpriority="high"');
           // Lazy images can use their actual layout width in modern browsers.
           // Retain approximate grid sizes as a fallback for older browsers.
-          const sizes = hero ? "100vw" : "auto, (max-width: 480px) calc(100vw - 38px), (max-width: 800px) calc((100vw - 64px) / 2), (max-width: 1150px) calc((100vw - 130px) / 3), (max-width: 1424px) calc((100vw - 162px) / 3), 421px";
+          const sizes = tag.match(/\bsizes="([^"]+)"/)?.[1] || (hero ? "100vw" : "auto, (max-width: 480px) calc(100vw - 38px), (max-width: 800px) calc((100vw - 64px) / 2), (max-width: 1150px) calc((100vw - 130px) / 3), (max-width: 1424px) calc((100vw - 162px) / 3), 421px");
           const srcset = format => photo.formats[format].map(({ size, reference }) => `${assetUrl(reference)} ${size}w`).join(", ");
           const fallback = assetUrl(photo.formats.webp[0].reference);
-          const img = tag.replace(/\bsrc="[^"]+"/, `src="${fallback}" srcset="${srcset("webp")}" sizes="${sizes}"`)
+          const img = tag.replace(/\s+sizes="[^"]*"/, "").replace(/\bsrc="[^"]+"/, `src="${fallback}" srcset="${srcset("webp")}" sizes="${sizes}"`)
             .replace(/\bwidth="\d+"/, `width="${photo.width}"`)
             .replace(/\bheight="\d+"/, `height="${photo.height}"`);
-          const mobile = hero ? ["avif", "webp"].map(format => `<source media="(max-width: 480px)" type="image/${format}" srcset="${assetUrl(photo.mobile[format])}">`).join("") : "";
+          const mobile = hero && photo.mobile.avif ? ["avif", "webp"].map(format => `<source media="(max-width: 480px)" type="image/${format}" srcset="${assetUrl(photo.mobile[format])}">`).join("") : "";
           return `<picture>${mobile}<source type="image/avif" srcset="${srcset("avif")}" sizes="${sizes}">${img}</picture>`;
         });
       },

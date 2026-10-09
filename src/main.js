@@ -1,5 +1,7 @@
+import { initNavigation } from "./navigation.js";
 import { initSmoothScroll } from "./smooth-scroll.js";
 
+initNavigation();
 const disposeSmoothScroll = initSmoothScroll();
 if (import.meta.hot) import.meta.hot.dispose(disposeSmoothScroll);
 
@@ -35,39 +37,6 @@ const materials = {
       "Une nuance solaire inspirée de la terre et des paysages méditerranéens. Une présence chaleureuse et expressive.",
   },
 };
-
-const menuButton = document.querySelector(".menu-toggle");
-const navigation = document.querySelector("#navigation");
-function closeMenu() {
-  menuButton.setAttribute("aria-expanded", "false");
-  menuButton.setAttribute("aria-label", "Ouvrir le menu");
-  navigation.classList.remove("is-open");
-}
-menuButton.addEventListener("click", () => {
-  const expanded = menuButton.getAttribute("aria-expanded") === "true";
-  menuButton.setAttribute("aria-expanded", String(!expanded));
-  menuButton.setAttribute(
-    "aria-label",
-    expanded ? "Ouvrir le menu" : "Fermer le menu",
-  );
-  navigation.classList.toggle("is-open", !expanded);
-});
-navigation
-  .querySelectorAll("a")
-  .forEach((link) => link.addEventListener("click", closeMenu));
-document.querySelectorAll(".mobile-actions a").forEach((link) => {
-  link.addEventListener("click", closeMenu);
-});
-document.addEventListener("keydown", (event) => {
-  if (
-    event.key === "Escape" &&
-    menuButton.getAttribute("aria-expanded") === "true"
-  ) {
-    closeMenu();
-    menuButton.focus();
-  }
-});
-window.matchMedia("(min-width: 801px)").addEventListener("change", closeMenu);
 
 const materialCards = [...document.querySelectorAll("[data-material]")];
 const filterButtons = [...document.querySelectorAll("[data-filter]")];
@@ -151,6 +120,9 @@ document.querySelectorAll('a[href="#confidentialite"]').forEach((link) => {
 document.querySelector("#year").textContent = String(new Date().getFullYear());
 
 const form = document.querySelector("#project-form");
+const projectTypes = { terrasse: "Terrasse ou cour", allee: "Allée ou accès", piscine: "Plage de piscine", desactive: "Béton désactivé" };
+const project = projectTypes[new URLSearchParams(window.location.search).get("projet")];
+if (project) document.querySelector("#project-type").value ||= project;
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (form.dataset.contactMode === "email") {
@@ -162,6 +134,8 @@ form.addEventListener("submit", async (event) => {
       `Nom : ${values.get("nom")}`,
       `E-mail : ${values.get("email")}`,
       `Ville : ${values.get("ville") || "Non précisée"}`,
+      `Téléphone : ${values.get("telephone") || "Non précisé"}`,
+      `Surface approximative (m²) : ${values.get("surface") || "Non précisée"}`,
       `Type de projet : ${values.get("projet")}`,
       `Nuance : ${values.get("nuance") || "À définir"}`,
       "",

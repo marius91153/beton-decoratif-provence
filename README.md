@@ -42,15 +42,25 @@ This command requires Python 3.11+ and a Netlify personal access token with acce
 
 Enable form detection in the Netlify project before deployment. The static `devis` form includes `data-netlify`, its form name and a honeypot. On Netlify, successful requests go to `/merci/`. Without JavaScript, the HTML form also submits natively. Configure submission notifications in Netlify, then verify a real submission after deployment. The local Vite server does not process form submissions.
 
-## Before the first public release
+## SEO, discovery and quotation pages
 
-- Approve the final brand details and design. The public Urbiscor site has now been inspected and its visual direction adapted to this project's French-language content.
-- Confirm service descriptions, available finishes, coverage area and branding with the business owner.
-- Add the business's legal identification, privacy contact, retention policy and any required legal notices. The current short data-use explanation is not a complete privacy policy.
-- The gallery now uses the owner's social project photographs. Original high-resolution photographs can replace video covers when available; each selected image links to its public source.
-- Commit and push the reviewed source to GitHub, deploy on Netlify and verify the live form. Creating files locally does not publish the site.
+The homepage targets stamped concrete in Provence. Four separate service URLs cover terraces, access paths, pool surrounds and exposed-aggregate concrete. Their HTML entry files are rendered by the pre-transform in `scripts/seo-pages.js`, using the French copy in `scripts/service-content.js`. Production contains complete static HTML, metadata, photographs, FAQs, breadcrumbs and links; content does not require JavaScript to be read or crawled. Update the sitemap and internal links when adding an indexable service.
 
-No analytics, remote fonts or third-party image requests are included.
+The renderer supplies canonical URLs on the custom domain, Open Graph/Twitter sharing tags and a HomeAndConstructionBusiness/WebSite/WebPage graph. Each service adds Service and BreadcrumbList entities. The site identifies the owner-confirmed SARL BETON IMPRIME PROVENCE, SIRET 95361735400014, at its registered office in Cuges-les-Pins. The visible identity and structured address agree. Provence coverage remains qualified by the actual project commune; ratings, prices and opening hours are not invented. `public/images/partage-beton-provence.jpg` is a social-size crop of the existing real terrace photograph, not a new project. `public/logo.svg` uses the website's existing brand mark. No third-party embeds or tracking scripts are loaded.
+
+`public/_redirects` permanently sends the production Netlify alias and the www hostname to the canonical custom domain while preserving the path. It does not configure DNS or redirect deploy-preview hostnames. Netlify reads these rules from the uploaded build. GitHub Pages retains canonical tags pointing to the equivalent primary-domain URL.
+
+The service quotation actions open the homepage with a validated project parameter and the contact fragment. The optional telephone and surface fields are carried to Netlify or the Pages email draft; the existing required fields, consent, anti-spam field and error recovery remain enabled. Both hosts run the shared SEO/conversion tests in addition to their existing checks. No real notification is sent by the tests.
+
+The legal, privacy and custom 404 pages are noindex; the confirmation remains noindex. The sitemap lists only the homepage and four service URLs. Local Vite preview uses its own fallback behavior; confirm a real HTTP 404 and canonical redirects on Netlify after publication.
+
+## Confirmed business identity and remaining details
+
+The owner supplied Google Business profile `https://share.google/DXVXiJCWUd30Av8cV`. It redirects to “SARL Béton Imprimé Provence”, knowledge ID `/g/11twj14ldl`. The official French company search identifies the active SARL BETON IMPRIME PROVENCE, SIRET 95361735400014, at 5 chemin de la Curasse, 13780 Cuges-les-Pins. On 2026-10-09 the owner explicitly confirmed this as the entity behind the current commercial brand. These facts are published consistently in the footer, `/mentions-legales/`, privacy information and the LocalBusiness-subtype graph. The Google profile is linked without cached ratings or reviews. Registry source: https://annuaire-entreprises.data.gouv.fr/entreprise/beton-imprime-provence-953617354.
+
+The actual retention practices, precise service area and any additional mandatory legal information such as share capital/publication director should be completed with the owner. The privacy page describes the known current flow and a data-rights contact; it does not establish full legal compliance or an automatic deletion policy. Original high-resolution business photos can replace video-derived images while preserving source records.
+
+Google Search Console ownership and sitemap submission require the appropriate property access; no connected Search Console capability is available here. Supply the primary sitemap URL `https://betondecoratifprovence.fr/sitemap.xml` when registering it. An indexable page and a sitemap do not guarantee Google indexing, rankings, traffic or enquiries. These outcomes require subsequent crawl/index monitoring and business results.
 
 ## Performance
 
