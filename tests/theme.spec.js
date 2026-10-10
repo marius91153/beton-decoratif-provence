@@ -1,23 +1,23 @@
 import { test, expect } from "@playwright/test";
 const base = process.env.PAGES_TEST ? "/beton-decoratif-provence/" : "/";
 const key = "bdp-theme";
-const ready = page => expect(toggle(page)).toBeEnabled();
+const ready = page => expect(page.locator("html")).toHaveAttribute("data-theme-ready", "true");
 const toggle = page => page.getByRole("button", { name: "Mode sombre", exact: true });
 
 test("system preference is live until the visitor makes a persistent explicit choice", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto(base);
   await ready(page);
-  await expect(page.locator("html")).toHaveClass("dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(page.locator("body")).toHaveCSS("background-color", "rgb(22, 25, 29)");
   await expect(toggle(page)).toHaveAttribute("aria-pressed", "true");
   await page.emulateMedia({ colorScheme: "light" });
-  await expect(page.locator("html")).toHaveClass("light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await toggle(page).click();
   expect(await page.evaluate(key => localStorage.getItem(key), key)).toBe("dark");
   await page.emulateMedia({ colorScheme: "dark" });
   await page.emulateMedia({ colorScheme: "light" });
-  await expect(page.locator("html")).toHaveClass("dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.reload();
   await ready(page);
   await expect(toggle(page)).toHaveAttribute("aria-pressed", "true");
@@ -25,11 +25,11 @@ test("system preference is live until the visitor makes a persistent explicit ch
   await page.emulateMedia({ colorScheme: "dark" });
   await page.reload();
   await ready(page);
-  await expect(page.locator("html")).toHaveClass("light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await page.evaluate(key => localStorage.setItem(key, "invalid-theme"), key);
   await page.reload();
   await ready(page);
-  await expect(page.locator("html")).toHaveClass("dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 });
 
 test("keyboard toggle, photographs, swatches and header remain correct at narrow and intermediate widths", async ({ page }) => {
@@ -73,7 +73,7 @@ test("the selected theme is available on every static page and after history nav
   await toggle(page).click();
   await page.goBack();
   await ready(page);
-  await expect(page.locator("html")).toHaveClass("light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
 
 test("other tabs synchronize preferences and storage clearing restores the system choice", async ({ page, context }) => {
@@ -114,7 +114,7 @@ test("blocked browser storage still allows changing themes without page errors",
   expect(errors).toEqual([]);
 });
 
-test("inline theme remains interactive even when application JavaScript is delayed", async ({ page }) => {
+test("a saved dark theme renders before delayed application JavaScript and enables the control when ready", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light" });
   await page.addInitScript(key => localStorage.setItem(key, "dark"), key);
   let release;
@@ -124,13 +124,9 @@ test("inline theme remains interactive even when application JavaScript is delay
     await page.goto(base, { waitUntil: "commit" });
     await expect(page.locator("h1")).toBeVisible();
     await expect(page.locator("body")).toHaveCSS("background-color", "rgb(22, 25, 29)");
-    await expect(page.locator("html")).toHaveClass("dark");
-    await ready(page);
-    await expect(toggle(page)).toBeVisible();
-    await expect(page.locator("body")).toHaveClass("dark");
-    await toggle(page).click();
-    await expect(page.locator("body")).toHaveClass("light");
-    await toggle(page).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await expect(page.locator(".theme-toggle")).toBeDisabled();
+    await expect(page.locator(".theme-toggle")).not.toBeVisible();
   } finally { release(); }
   await page.waitForLoadState("load");
   await ready(page);
@@ -165,12 +161,9 @@ test("the theme adds no idle animation loop, network request or layout shift whe
     const raf = window.requestAnimationFrame;
     window.requestAnimationFrame = callback => { window.themeRafCalls++; return raf.call(window, callback); };
   });
-  const initialRequests = [];
-  page.on("request", request => initialRequests.push(request.url()));
   await page.goto(base);
   await ready(page);
   await page.waitForLoadState("networkidle");
-  expect(initialRequests.filter(url => /\/(?:color-mode|smooth-scroll)-[^/]+\.js/.test(url))).toEqual([]);
   const requests = [];
   page.on("request", request => requests.push(request.url()));
   await page.evaluate(() => {

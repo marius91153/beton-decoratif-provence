@@ -5,6 +5,8 @@
   try { choice = localStorage.getItem("bdp-theme"); } catch {}
   if (choice === "light" || choice === "dark") {
     root.dataset.themePreference = choice;
-  } else choice = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  root.classList.add(choice);
+    root.dataset.theme = choice;
+  } else {
+    root.dataset.theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
 })();

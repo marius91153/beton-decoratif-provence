@@ -38,40 +38,42 @@ async function near(page, position) {
     .toBeLessThanOrEqual(position + 1);
 }
 
-test("wheel scrolling is browser-owned with no intercepted gestures or JavaScript animation frames", async ({ page }) => {
+test("wheel movement eases to its destination and schedules no frames while idle", async ({ page }) => {
   await probe(page);
-  await expect(page.locator("html")).toHaveCSS("scroll-behavior", "smooth");
+  const fine = await page.evaluate(() => matchMedia("(any-pointer: fine)").matches);
   await page.mouse.wheel(0, 600);
   await near(page, 600);
-  expect(await page.evaluate(() => window.__scrollProbe.prevented)).toBe(false);
-  expect(await page.evaluate(() => window.__scrollProbe.calls)).toBe(0);
+  await expect.poll(() => page.evaluate(() => window.__scrollProbe.pending.size)).toBe(0);
+  const result = await page.evaluate(() => ({
+    positions: window.__scrollProbe.positions,
+    calls: window.__scrollProbe.calls,
+    prevented: window.__scrollProbe.prevented,
+  }));
+  expect(result.prevented).toBe(fine);
+  if (fine) {
+    expect(result.positions.length).toBeGreaterThan(5);
+    expect(result.positions[0]).toBeGreaterThan(0);
+    expect(result.positions[0]).toBeLessThan(600);
+    expect(result.positions.every((y, i, positions) => !i || y >= positions[i - 1])).toBe(true);
+  } else {
+    expect(result.calls).toBe(0);
+  }
   await page.waitForTimeout(250);
-  expect(await page.evaluate(() => window.__scrollProbe.calls)).toBe(0);
+  expect(await page.evaluate(() => window.__scrollProbe.calls)).toBe(result.calls);
 });
 
-test("CSS anchors animate without application JavaScript and respect the header offset", async ({ browser }, testInfo) => {
-  const context = await browser.newContext({ javaScriptEnabled: false, reducedMotion: "no-preference", viewport: testInfo.project.use.viewport });
-  const page = await context.newPage();
-  const base = process.env.PAGES_TEST ? "/beton-decoratif-provence/" : "/";
-  try {
-    await page.goto("http://127.0.0.1:4173" + base);
-    await page.evaluate(() => document.fonts.ready);
-    await expect(page.locator("html")).toHaveCSS("scroll-behavior", "smooth");
-    const target = await page.locator("#contact").evaluate(el => el.offsetTop);
-    await page.locator('.hero-actions a[href="#contact"]').evaluate(el => el.click());
-    await expect(page).toHaveURL(/#contact$/);
-    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
-    expect(await page.evaluate(() => scrollY)).toBeLessThan(target - 160);
-    await expect.poll(() => page.locator("#contact").evaluate(el => el.getBoundingClientRect().top))
-      .toBeLessThanOrEqual(160);
-    await page.waitForTimeout(250);
-    const top = await page.locator("#contact").evaluate(el => el.getBoundingClientRect().top);
-    expect(top).toBeGreaterThanOrEqual(-1);
-    expect(top).toBeLessThanOrEqual(160);
-  } finally { await context.close(); }
+test("successive wheel gestures accumulate and can reverse direction", async ({ page }) => {
+  await probe(page);
+  await page.mouse.wheel(0, 400);
+  await page.waitForTimeout(90);
+  await page.mouse.wheel(0, 350);
+  await page.waitForTimeout(70);
+  await page.mouse.wheel(0, -200);
+  await near(page, 550);
+  await expect.poll(() => page.evaluate(() => window.__scrollProbe.pending.size)).toBe(0);
 });
 
-test("keyboard and CSS anchor navigation remain usable after wheel gestures", async ({ page }, testInfo) => {
+test("keyboard and anchor navigation interrupt wheel inertia without being pulled back", async ({ page }, testInfo) => {
   await probe(page);
   await page.mouse.wheel(0, 600);
   await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
@@ -128,22 +130,19 @@ test("textarea and modal scrolling stay native and do not move the background", 
   await expect(dialog).not.toBeVisible();
 });
 
-test("CSS scrolling respects live reduced-motion preferences and preserves zoom gestures", async ({ page }) => {
+test("reduced motion changes cancel animation and zoom gestures are untouched", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await probe(page);
-  await expect(page.locator("html")).toHaveCSS("scroll-behavior", "auto");
   await page.mouse.wheel(0, 350);
   await near(page, 350);
   expect(await page.evaluate(() => window.__scrollProbe.prevented)).toBe(false);
   expect(await page.evaluate(() => window.__scrollProbe.calls)).toBe(0);
 
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await expect(page.locator("html")).toHaveCSS("scroll-behavior", "smooth");
   await page.mouse.wheel(0, 200);
-  await near(page, 550);
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(350);
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await expect(page.locator("html")).toHaveCSS("scroll-behavior", "auto");
-  expect(await page.evaluate(() => window.__scrollProbe.calls)).toBe(0);
+  await expect.poll(() => page.evaluate(() => window.__scrollProbe.pending.size)).toBe(0);
   const stopped = await page.evaluate(() => scrollY);
   await page.waitForTimeout(1250);
   expect(await page.evaluate(() => scrollY)).toBe(stopped);

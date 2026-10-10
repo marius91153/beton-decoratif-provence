@@ -18,7 +18,7 @@
   background: var(--surface);
   color: var(--ink);
 }
-:root.dark {
+:root[data-theme="dark"] {
   color-scheme: dark;
   --surface: #16191d;
   --card: #1b222b;
@@ -37,7 +37,7 @@
 }
 /* System preference also works when JavaScript is unavailable. */
 @media (prefers-color-scheme: dark) {
-  :root:not(.light):not(.dark) {
+  :root:not([data-theme]) {
     color-scheme: dark;
     --surface: #16191d;
     --card: #1b222b;
@@ -127,8 +127,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--gold-ink); }
 .theme-toggle svg { grid-area: 1 / 1; pointer-events: none; transform-origin: center; }
 .theme-icon-moon { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
 .theme-icon-sun { opacity: 0; transform: translateY(4px) rotate(-45deg) scale(.55); }
-.dark .theme-icon-moon { opacity: 0; transform: translateY(-4px) rotate(45deg) scale(.55); }
-.dark .theme-icon-sun { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
+[data-theme="dark"] .theme-icon-moon { opacity: 0; transform: translateY(-4px) rotate(45deg) scale(.55); }
+[data-theme="dark"] .theme-icon-sun { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
 @media (prefers-reduced-motion: no-preference) {
   .theme-toggle:enabled { transition: transform .16s ease; }
   .theme-toggle:enabled::before, .theme-toggle:enabled::after { transition: opacity .22s ease; }

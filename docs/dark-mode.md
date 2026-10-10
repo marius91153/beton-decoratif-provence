@@ -1,22 +1,4 @@
-# Display theme
-
-## Current implementation — 2026-10-10
-
-The palette and control animation remain entirely in CSS. A small minified classic script chooses the `light`/`dark` class on `<html>` before styles to avoid a theme flash. A second classic inline script after the body markup binds the accessible button and applies those classes to both `<html>` and `<body>`. Keeping the root class establishes the theme before the body exists and styles the viewport/native controls consistently.
-
-There is no external color-mode JavaScript chunk or confirmation module. The button works independently of delayed application JavaScript. Only an explicit choice is stored in `bdp-theme`; otherwise the theme follows live system preference. Keyboard operation, cross-tab updates, restored history, clearing/invalid preferences and denied storage remain supported. CSS follows the OS when JavaScript is disabled. Photos, swatches, the 44px control, its motion preference and all nine static pages retain the existing design.
-
-The build minifies both inline scripts using Vite's existing minifier, with no package/lockfile change. Theme changes schedule no JavaScript frames, fetch no resources and cause no layout shift. Inlining includes the tiny control in each HTML document rather than reusing an external cache entry. The former native wheel-inertia controller is removed separately in favor of existing CSS anchor smoothing.
-
-Use `npm run build && npm test` and `npm run build:pages && PAGES_TEST=1 npm test`. Both targets exercise theme behavior with delayed unrelated modules and assert no initial color-mode/smooth-scroll JavaScript request. New performance evidence is recorded separately; the measurements below describe the prior implementation, not this revision.
-
-## Current local measurements — 2026-10-10
-
-The revised default build passed 58 browser checks on desktop/mobile. Four fresh, serial local Lighthouse 13.5.0 / Chromium 151 homepage audits confirmed light/dark OS preferences in fresh browsers. Mobile performance scored 100 light / 99 dark; desktop scored 100 in both themes. Accessibility, best practices and SEO scored 100 throughout. All four measured TBT 0 ms and CLS 0. Mobile LCP was 1.81 s light / 1.88 s dark; desktop LCP was 0.45 s in either theme. These are local laboratory results, not Google-hosted PageSpeed or field Core Web Vitals.
-
-Using identical Python gzip settings, emitted JavaScript shrank from 4,513 to 2,941 bytes compressed. Homepage HTML grew from 21,719 to 22,140 bytes with the inlined control. The homepage HTML + its referenced JavaScript decreased by approximately 1 KB compressed, and one initial JavaScript request was eliminated. This compares payloads rather than measured CDN transfer sizes. Confirmation now needs no external JavaScript. The native CSS scrolling intentionally drops custom wheel easing. Reports and candidates are retained under `/workspace/scratch/css-inline-2026-10-10`.
-
-## Archived implementation and measurements — 2026-10-09
+# Display theme — 2026-10-09
 
 ## Reference and implementation
 
